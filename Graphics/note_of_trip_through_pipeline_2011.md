@@ -1,4 +1,4 @@
-#[part-1 Introduction: the Software stack](http://fgiesen.wordpress.com/2011/07/01/a-trip-through-the-graphics-pipeline-2011-part-1/)#
+#[Part 1 Introduction; the Software stack](http://fgiesen.wordpress.com/2011/07/01/a-trip-through-the-graphics-pipeline-2011-part-1/)#
 
 
 ##The D3D Software Stack is##
@@ -31,7 +31,7 @@
 - no sharp distinction between the API and UMD layer
 - shader compilation handled by driver, which means drivers have to do all the optimizations themselves
 
-#[part-2 GPU memory architecture and the Command Processor](http://fgiesen.wordpress.com/2011/07/02/a-trip-through-the-graphics-pipeline-2011-part-2/)#
+#[Part 2 GPU memory architecture and the Command Processor](http://fgiesen.wordpress.com/2011/07/02/a-trip-through-the-graphics-pipeline-2011-part-2/)#
 - difference
 	- high bandwidth/throughput 
 	- high latency
@@ -64,3 +64,56 @@
 		- You don’t want to reserve state space for 2*128 active textures just because you’re keeping track of 2 in-flight state sets so you might need it. For such cases, you can use a kind of register renaming scheme – have a pool of 128 physical texture descriptors.
 - Synchronization
 	
+#[Part 3: 3D pipeline overview, vertex processing](http://fgiesen.wordpress.com/2011/07/03/a-trip-through-the-graphics-pipeline-2011-part-3/)#
+
+
+#[Part 4: Texture samplers](http://fgiesen.wordpress.com/2011/07/04/a-trip-through-the-graphics-pipeline-2011-part-4/)#
+
+- Texture cache
+	- Most texture sampling is done in Pixel Shaders with mip-mapping enabled
+	- L2
+		- a completely bog-standard cache that happens to cache memory containing texture data
+	- L1
+		- not quite as standard
+		- small, on the order of 4-8kb per sampler
+	- texture sampler pipes are long enough to not stall for a memory read even though it takes 400-800 cycles.
+	- small L1 cache, long pipeline 
+	- Compressed texture format
+		- BC4 and 5/BC6H and 7 are all block-based methods that encode blocks of 4×4 pixels individually
+		- the 4×4 blocks are decoded when it’s brought into the L1 cache
+
+#[Part 5: Primitive Assembly, Clip/Cull, Projection, and Viewport transform](http://fgiesen.wordpress.com/2011/07/05/a-trip-through-the-graphics-pipeline-2011-part-5/)#
+
+- Primitive Assembly
+	- assemble all the vertices belonging to a single primitive
+- Clip
+	- Guard-band clipping for X & Y
+- Projection and viewport transform 
+	- just takes the x, y and z coordinates and divides them by w
+	- This gives us normalized device coordinates, or NDCs, between -1 and 1
+
+#[Part 6: (Triangle) rasterization and setup](http://fgiesen.wordpress.com/2011/07/06/a-trip-through-the-graphics-pipeline-2011-part-6/)#
+- Fine Rasterizer
+	- In hardware, the “triangle rasterizer” is a block that tells you what (sub-)pixels a triangle covers
+	- in some cases, it’ll also give you barycentric coordinates of those pixels inside the triangle. But that’s it. No u’s or v’s – not even 1/z’s.
+	- we want our rasterizer to output in groups of 2×2 pixels(?), not scan-line by scan-line
+	- [A Parallel Algorithm for Polygon Rasterization](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.157.4621&rep=rep1&type=pdf) 
+	- loop over all candidate pixels and test whether they’re actually inside the triangle
+- Coarse Rasterizer 
+	- tells us which tiles might be covered by the triangle. This rasterizer can be made smaller (8×8 at this level really seems like overkill!), and it doesn’t need to be as fast (because it’s only run for each 8×8 block). In other words, at this level, the cost of discovering empty blocks is correspondingly lower.
+- Tiled renderes 
+	- need at least another “ultra-coarse” rasterization stage that runs early and finds out which of the (large) tiles are covered by each triangle; this stage is usually called “binning”. 
+
+#[Part 7: Z/Stencil processing, 3 different ways](http://fgiesen.wordpress.com/2011/07/08/a-trip-through-the-graphics-pipeline-2011-part-7/)#
+
+#[Part 8: Pixel processing – “fork phase”](http://fgiesen.wordpress.com/2011/07/10/a-trip-through-the-graphics-pipeline-2011-part-8/)#
+
+#[Part 9: Pixel processing – “join phase”](http://fgiesen.wordpress.com/2011/07/12/a-trip-through-the-graphics-pipeline-2011-part-9/)#
+
+#[Part 10: Geometry Shaders](http://fgiesen.wordpress.com/2011/07/20/a-trip-through-the-graphics-pipeline-2011-part-10/)#
+
+#[Part 11: Stream-Out](http://fgiesen.wordpress.com/2011/08/14/a-trip-through-the-graphics-pipeline-2011-part-11/)#
+
+#[Part 12: Tessellation](http://fgiesen.wordpress.com/2011/09/06/a-trip-through-the-graphics-pipeline-2011-part-12/)#
+
+#[Part 13: Compute Shaders](http://fgiesen.wordpress.com/2011/10/09/a-trip-through-the-graphics-pipeline-2011-part-13/)#
